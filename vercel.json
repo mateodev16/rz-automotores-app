@@ -3,5 +3,6 @@
   "framework": "astro",
   "installCommand": "npm install",
   "buildCommand": "npm run build --workspace=apps/web",
-  "outputDirectory": "apps/web/.vercel/output"
+  "outputDirectory": "apps/web/.vercel/output",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
