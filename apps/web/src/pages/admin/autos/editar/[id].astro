@@ -1,0 +1,44 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import VehicleForm from '../../../../components/admin/VehicleForm.astro';
+import Icon from '../../../../components/Icon.astro';
+import { getCar } from '../../../../lib/cars';
+
+const { id } = Astro.params;
+const car = id ? await getCar(id) : null;
+
+if (!car) {
+  Astro.response.status = 404;
+}
+---
+
+<AdminLayout title="Editar vehículo">
+  {
+    car ? (
+      <>
+        <a
+          href="/admin"
+          class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-black/45 hover:text-black"
+        >
+          <Icon name="chevron" size={16} class="rotate-180" /> Volver al panel
+        </a>
+        <div class="eyebrow mt-8">Inventario</div>
+        <h1 class="font-display mt-2 text-4xl font-black italic md:text-5xl">
+          Editar {car.brand} {car.model}
+        </h1>
+        <p class="mt-2 text-sm text-black/45">Actualizá los datos del vehículo publicado.</p>
+
+        <div class="mt-8">
+          <VehicleForm formId="vehicle-form" mode="edit" car={car} />
+        </div>
+      </>
+    ) : (
+      <div class="py-24 text-center">
+        <Icon name="search" size={32} class="mx-auto" />
+        <h1 class="font-display mt-6 text-4xl font-black italic">Vehículo no encontrado</h1>
+        <p class="mt-4 text-black/55">El vehículo que buscás ya no está en el catálogo.</p>
+        <a href="/admin" class="btn-black mt-8">Volver al panel</a>
+      </div>
+    )
+  }
+</AdminLayout>

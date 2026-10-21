@@ -5,18 +5,18 @@ async function migrate() {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
-    await client.query(
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role VARCHAR(50) DEFAULT 'admin',
         created_at TIMESTAMP DEFAULT NOW()
-      );
-    );
-    
-    await client.query(
+      )
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS cars (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         brand VARCHAR(100) NOT NULL,
@@ -24,7 +24,7 @@ async function migrate() {
         year INTEGER NOT NULL,
         km INTEGER,
         price DECIMAL(12,2) NOT NULL,
-        currency VARCHAR(10) DEFAULT 'UYU',
+        currency VARCHAR(10) DEFAULT 'USD',
         location VARCHAR(50) CHECK (location IN ('Montevideo', 'Minas', 'Ambos')) DEFAULT 'Montevideo',
         fuel VARCHAR(50),
         transmission VARCHAR(50),
@@ -35,20 +35,20 @@ async function migrate() {
         featured BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
-      );
-    );
-    
-    await client.query(
+      )
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS car_images (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         car_id UUID REFERENCES cars(id) ON DELETE CASCADE,
         image_url VARCHAR(500) NOT NULL,
         sort_order INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
-      );
-    );
-    
-    await client.query(
+      )
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS inquiries (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         car_id UUID REFERENCES cars(id) ON DELETE SET NULL,
@@ -56,21 +56,21 @@ async function migrate() {
         phone VARCHAR(50),
         message TEXT,
         created_at TIMESTAMP DEFAULT NOW()
-      );
-    );
-    
-    // Create default admin
-    const email = 'admin@rzautomotores.com';
-    const password = 'admin123';
+      )
+    `);
+
+    // Default admin user
+    const email = process.env.ADMIN_EMAIL || 'admin@rzautomotores.com';
+    const password = process.env.ADMIN_PASSWORD || 'admin123';
     const hash = await bcrypt.hash(password, 10);
     await client.query(
-      'INSERT INTO users (email, password_hash) VALUES (, ) ON CONFLICT (email) DO NOTHING',
-      [email, hash]
+      'INSERT INTO users (email, password_hash) VALUES ($1, $2) ON CONFLICT (email) DO NOTHING',
+      [email, hash],
     );
-    
+
     await client.query('COMMIT');
     console.log('Migration complete');
-    console.log('Default admin: admin@rzautomotores.com / admin123');
+    console.log(`Default admin: ${email} / ${password}`);
   } catch (e) {
     await client.query('ROLLBACK');
     console.error('Migration failed:', e);

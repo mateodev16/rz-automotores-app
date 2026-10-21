@@ -1,0 +1,70 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { WHATSAPP_LINK } from '../lib/config';
+
+const links = [
+  ['Stock', '/#stock'],
+  ['Nosotros', '/#nosotros'],
+  ['Sucursales', '/#sucursales'],
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-black/10 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-10">
+    <Logo />
+    <nav class="hidden items-center gap-9 md:flex">
+      {
+        links.map(([label, href]) => (
+          <a key={href} href={href} class="nav-link">
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="hidden items-center gap-3 md:flex">
+      <a href="/admin" class="btn-ghost">
+        <Icon name="dashboard" size={17} /> Administrar
+      </a>
+      <a class="btn-black" href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
+        <Icon name="whatsapp" size={18} /> Contactar
+      </a>
+    </div>
+    <button
+      type="button"
+      id="menu-toggle"
+      class="grid size-11 place-items-center border border-black/15 md:hidden"
+      aria-label="Abrir menÃº"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <Icon name="menu" />
+    </button>
+  </div>
+  <div id="mobile-menu" class="hidden border-t border-black/10 bg-white px-5 py-5 md:hidden">
+    <nav class="flex flex-col gap-1">
+      {
+        links.map(([label, href]) => (
+          <a key={href} href={href} class="mobile-link">
+            {label}
+          </a>
+        ))
+      }
+      <a href="/admin" class="mobile-link">Administrar stock</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden');
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    toggle.innerHTML = isOpen
+      ? '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 6 12 12M18 6 6 18" /></svg>'
+      : '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>';
+  });
+</script>

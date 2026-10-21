@@ -1,0 +1,152 @@
+---
+import Icon from './Icon.astro';
+import CarCard from './CarCard.astro';
+import type { Car } from '../lib/types';
+
+interface Props {
+  cars: Car[];
+  brands: string[];
+  locations: string[];
+  eyebrow?: string;
+  title?: string;
+  /** Initial number of cards rendered before "Ver más". */
+  step?: number;
+}
+
+const {
+  cars,
+  brands,
+  locations,
+  eyebrow = 'Nuestro stock',
+  title = 'Encontrá el tuyo.',
+  step = 6,
+} = Astro.props;
+---
+
+<section id="stock" class="bg-[#f4f4f2] px-5 py-24 md:px-10 lg:py-32">
+  <div class="mx-auto max-w-[1380px]">
+    <div class="flex flex-col justify-between gap-8 border-b border-black/15 pb-8 lg:flex-row lg:items-end">
+      <div>
+        <div class="eyebrow">{eyebrow}</div>
+        <h2 class="section-title">{title}</h2>
+      </div>
+      <div class="flex flex-wrap gap-3" id="stock-filters">
+        <label class="filter-field">
+          <span>Marca</span>
+          <select id="filter-brand">
+            <option value="Todas">Todas</option>
+            {brands.map((brand) => <option value={brand}>{brand}</option>)}
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>Ubicación</span>
+          <select id="filter-location">
+            <option value="Todas">Todas</option>
+            {locations.map((location) => <option value={location}>{location}</option>)}
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>Precio máx. (US$)</span>
+          <input id="filter-price" type="number" min="0" placeholder="Sin límite" class="mt-0.5 w-full bg-transparent text-sm outline-none" />
+        </label>
+        <label class="filter-field">
+          <span>Año mín.</span>
+          <input id="filter-year" type="number" min="1950" max="2030" placeholder="Sin límite" class="mt-0.5 w-full bg-transparent text-sm outline-none" />
+        </label>
+      </div>
+    </div>
+
+    {
+      cars.length ? (
+        <>
+          <div class="mt-9 grid gap-x-5 gap-y-10 md:grid-cols-2 xl:grid-cols-3" id="stock-grid">
+            {cars.map((car) => (
+              <CarCard car={car} />
+            ))}
+          </div>
+          <div class="mt-14 text-center" id="load-more-wrapper">
+            <button type="button" class="btn-outline" id="load-more">
+              Ver más vehículos
+            </button>
+          </div>
+        </>
+      ) : (
+        <div class="py-24 text-center" id="stock-empty">
+          <Icon name="search" size={32} class="mx-auto" />
+          <p class="mt-4 text-black/55">No encontramos vehículos con esos filtros.</p>
+        </div>
+      )
+    }
+    <div class="py-24 text-center hidden" id="stock-empty-filters">
+      <Icon name="search" size={32} class="mx-auto" />
+      <p class="mt-4 text-black/55">No encontramos vehículos con esos filtros.</p>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ step }}>
+  const cards = Array.from(document.querySelectorAll('[data-car-card]'));
+  const brandSelect = document.getElementById('filter-brand');
+  const locationSelect = document.getElementById('filter-location');
+  const priceInput = document.getElementById('filter-price');
+  const yearInput = document.getElementById('filter-year');
+  const loadMore = document.getElementById('load-more');
+  const loadMoreWrapper = document.getElementById('load-more-wrapper');
+  const emptyState = document.getElementById('stock-empty-filters');
+
+  let limit = step;
+
+  const matches = (card) => {
+    const brand = brandSelect?.value ?? 'Todas';
+    const location = locationSelect?.value ?? 'Todas';
+    const maxPrice = Number(priceInput?.value) || 0;
+    const minYear = Number(yearInput?.value) || 0;
+
+    if (brand !== 'Todas' && card.dataset.brand !== brand) return false;
+    if (location !== 'Todas' && card.dataset.location !== location) return false;
+
+    if (maxPrice) {
+      const price = Number(card.dataset.price ?? 0);
+      if (!price || price > maxPrice) return false;
+    }
+    if (minYear) {
+      const year = Number(card.dataset.year ?? 0);
+      if (!year || year < minYear) return false;
+    }
+    return true;
+  };
+
+  const applyLimit = () => {
+    let shown = 0;
+    let matched = 0;
+    cards.forEach((card) => {
+      const ok = matches(card);
+      if (ok) matched += 1;
+      if (!ok) {
+        card.classList.add('hidden');
+        return;
+      }
+      shown += 1;
+      card.classList.toggle('hidden', shown > limit);
+    });
+    loadMoreWrapper?.classList.toggle('hidden', matched <= limit);
+    emptyState?.classList.toggle('hidden', matched > 0);
+  };
+
+  const reset = () => {
+    limit = step;
+    applyLimit();
+  };
+
+  brandSelect?.addEventListener('change', reset);
+  locationSelect?.addEventListener('change', reset);
+  priceInput?.addEventListener('input', reset);
+  yearInput?.addEventListener('input', reset);
+
+  loadMore?.addEventListener('click', () => {
+    limit += step;
+    applyLimit();
+  });
+
+  applyLimit();
+</script>

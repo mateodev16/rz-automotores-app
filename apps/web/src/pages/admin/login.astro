@@ -1,0 +1,112 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Logo from '../../components/Logo.astro';
+import Icon from '../../components/Icon.astro';
+---
+
+<Layout title="Acceso al panel - RZ Automotores" bodyClass="bg-black">
+  <div class="grid min-h-screen lg:grid-cols-2">
+    <div class="relative hidden overflow-hidden lg:block">
+      <img
+        src="https://images.unsplash.com/photo-1760713170685-b67abc3be5ad?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=90&w=1400"
+        alt="Vehículo RZ Automotores"
+        width="1400"
+        height="933"
+        class="absolute inset-0 size-full object-cover grayscale"
+      />
+      <div class="absolute inset-0 bg-black/70"></div>
+      <div class="absolute inset-0 flex flex-col justify-between p-12 text-white">
+        <Logo dark />
+        <div>
+          <div class="eyebrow text-white/60">Panel de control</div>
+          <h1 class="font-display mt-3 max-w-md text-6xl font-black uppercase italic leading-[.9]">
+            Gestioná tu stock en un solo lugar.
+          </h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center bg-black px-5 py-16 text-white">
+      <div class="w-full max-w-sm">
+        <Logo dark class="lg:hidden" />
+        <div class="mt-10 text-xs font-bold uppercase tracking-[.2em] text-white/40">Acceso</div>
+        <h2 class="font-display mt-3 text-4xl font-black uppercase italic">Iniciar sesión</h2>
+        <form id="login-form" class="mt-8 space-y-5">
+          <label class="form-field">
+            <span>Email</span>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autocomplete="username"
+              placeholder="admin@rz.com.uy"
+              class="border-white/20 bg-white/5 text-white placeholder:text-white/30"
+            />
+          </label>
+          <label class="form-field">
+            <span>Contraseña</span>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              class="border-white/20 bg-white/5 text-white placeholder:text-white/30"
+            />
+          </label>
+          <button type="submit" class="btn-white w-full justify-center" data-submit>
+            <Icon name="check" /> Ingresar
+          </button>
+          <p id="error" class="hidden text-xs text-red-400"></p>
+        </form>
+        <a href="/" class="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-white/50 hover:text-white">
+          <Icon name="arrow" size={16} class="rotate-180" /> Volver al sitio
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { setToken } from '../../lib/client';
+
+  const form = document.getElementById('login-form');
+  const errorEl = document.getElementById('error');
+  const submit = form?.querySelector('[data-submit]');
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorEl?.classList.add('hidden');
+    submit?.setAttribute('disabled', 'disabled');
+
+    const email = (form.elements.namedItem('email') as HTMLInputElement)?.value ?? '';
+    const password = (form.elements.namedItem('password') as HTMLInputElement)?.value ?? '';
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000'}/api/auth/login`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? 'No se pudo iniciar sesión.');
+      }
+
+      setToken(data.token);
+      window.location.href = '/admin';
+    } catch (error) {
+      if (errorEl) {
+        errorEl.textContent = (error as Error)?.message ?? 'Error de conexión.';
+        errorEl.classList.remove('hidden');
+      }
+      submit?.removeAttribute('disabled');
+    }
+  });
+</script>

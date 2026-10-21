@@ -1,0 +1,65 @@
+---
+import Icon from './Icon.astro';
+
+const highlights = [
+  'Vehículos seleccionados',
+  'Financiación a medida',
+  'Tomamos tu usado',
+  'Gestoría y respaldo',
+];
+---
+
+<section id="nosotros" class="grid bg-white lg:grid-cols-2">
+  <div class="relative min-h-[520px] overflow-hidden bg-neutral-900">
+    <img
+      src="https://images.unsplash.com/photo-1765446838156-c840eb80e61a?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=85&w=1400"
+      alt="Automóvil en ruta"
+      width="1400"
+      height="933"
+      loading="lazy"
+      class="absolute inset-0 size-full object-cover grayscale"
+    />
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div
+      class="absolute bottom-7 left-7 border border-white/35 bg-black/65 px-5 py-4 text-white backdrop-blur md:bottom-10 md:left-10"
+    >
+      <div class="text-xs font-bold uppercase tracking-[.18em] text-white/55">Compromiso RZ</div>
+      <div class="font-display mt-1 text-xl font-extrabold italic">Cada auto, revisado.</div>
+    </div>
+  </div>
+  <div class="flex items-center px-5 py-20 md:px-16 lg:px-20 xl:px-28">
+    <div class="max-w-xl">
+      <div class="eyebrow">Comprar con confianza</div>
+      <h2 class="section-title mt-3">Buenas decisiones empiezan con información clara.</h2>
+      <p class="mt-7 leading-relaxed text-black/55">
+        No se trata solamente de vender autos. Se trata de escuchar qué necesitás, mostrarte cada detalle y
+        acompañarte antes, durante y después de la compra.
+      </p>
+      <div class="mt-9 grid gap-5 sm:grid-cols-2">
+        {
+          highlights.map((item) => (
+            <div class="flex items-center gap-3 border-t border-black/15 pt-4 text-sm font-bold">
+              <span class="grid size-7 place-items-center bg-black text-white">
+                <Icon name="check" size={15} />
+              </span>
+              {item}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="overflow-hidden bg-black py-5 text-white">
+  <div class="ticker font-display flex whitespace-nowrap text-3xl font-black uppercase italic text-white/90 md:text-5xl">
+    <span>
+      Tu usado vale&nbsp;—&nbsp; Financiación &nbsp;—&nbsp; Calidad RZ &nbsp;—&nbsp; Atención personalizada
+      &nbsp;—&nbsp;
+    </span>
+    <span aria-hidden="true">
+      Tu usado vale&nbsp;—&nbsp; Financiación &nbsp;—&nbsp; Calidad RZ &nbsp;—&nbsp; Atención personalizada
+      &nbsp;—&nbsp;
+    </span>
+  </div>
+</section>

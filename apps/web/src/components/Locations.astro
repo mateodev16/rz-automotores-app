@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+
+const places = [
+  {
+    city: 'Minas',
+    address: 'Av. Artigas 742, Lavalleja',
+    phone: '4442 0000',
+    hours: 'Lun a sáb · 09:00 — 18:30',
+  },
+  {
+    city: 'Montevideo',
+    address: 'Av. Italia 4280, Montevideo',
+    phone: '2487 0000',
+    hours: 'Lun a sáb · 09:00 — 19:00',
+  },
+];
+---
+
+<section id="sucursales" class="bg-white px-5 py-24 md:px-10 lg:py-32">
+  <div class="mx-auto max-w-[1380px]">
+    <div class="eyebrow">Estamos cerca</div>
+    <h2 class="section-title mt-3">Dos puntos. El mismo respaldo.</h2>
+    <div class="mt-12 grid gap-px bg-black/15 lg:grid-cols-2">
+      {
+        places.map((place, index) => (
+          <article
+            class={`group relative min-h-[340px] overflow-hidden p-8 text-white md:p-12 ${
+              index ? 'bg-neutral-900' : 'bg-black'
+            }`}
+          >
+            <div class="absolute right-5 top-0 font-display text-[11rem] font-black italic leading-none text-white/[.035]">
+              {index + 1}
+            </div>
+            <div class="relative flex h-full flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <div class="grid size-12 place-items-center border border-white/25">
+                  <Icon name="location" />
+                </div>
+                <span class="text-xs font-bold uppercase tracking-[.18em] text-white/45">Uruguay</span>
+              </div>
+              <div>
+                <h3 class="font-display text-5xl font-black uppercase italic">{place.city}</h3>
+                <p class="mt-3 text-white/60">{place.address}</p>
+                <div class="mt-7 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-5 text-sm">
+                  <span>{place.phone}</span>
+                  <span class="text-white/55">{place.hours}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

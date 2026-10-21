@@ -1,0 +1,72 @@
+---
+import Icon from './Icon.astro';
+import type { Car } from '../lib/types';
+import { formatKm } from '../lib/format';
+
+interface Props {
+  featured?: Car;
+}
+
+const { featured } = Astro.props;
+---
+
+<section id="inicio" class="relative overflow-hidden bg-black text-white">
+  <div class="mx-auto grid min-h-[680px] max-w-[1600px] lg:grid-cols-[1.05fr_.95fr]">
+    <div class="relative z-10 flex flex-col justify-center px-5 py-24 md:px-10 lg:px-16 xl:px-24">
+      <div class="mb-8 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em] text-white/65">
+        <span class="h-px w-9 bg-white/60"></span>
+        Desde 2008 en movimiento
+      </div>
+      <h1 class="font-display max-w-3xl text-[clamp(3.8rem,7vw,7.5rem)] font-black uppercase italic leading-[.82] tracking-[-.055em]">
+        Tu próximo
+        <span class="mt-2 block text-outline">auto está acá.</span>
+      </h1>
+      <p class="mt-9 max-w-xl text-base leading-relaxed text-white/65 md:text-lg">
+        Seleccionamos vehículos que valen la pena. Respaldo, transparencia y atención personal en Minas y
+        Montevideo.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="#stock" class="btn-white">
+          Ver vehículos <Icon name="arrow" />
+        </a>
+        <a href="#sucursales" class="btn-dark-outline">Nuestras sucursales</a>
+      </div>
+      <div class="mt-16 flex gap-10 border-t border-white/15 pt-7">
+        <div>
+          <div class="font-display text-3xl font-black italic">+15</div>
+          <div class="mt-1 text-xs uppercase tracking-widest text-white/45">Años de experiencia</div>
+        </div>
+        <div>
+          <div class="font-display text-3xl font-black italic">2</div>
+          <div class="mt-1 text-xs uppercase tracking-widest text-white/45">Sucursales</div>
+        </div>
+      </div>
+    </div>
+    <div class="relative min-h-[480px] lg:min-h-full">
+      <img
+        src="https://images.unsplash.com/photo-1760713170685-b67abc3be5ad?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=90&w=1600"
+        alt="SUV de alta gama en estudio"
+        width="1600"
+        height="1067"
+        loading="eager"
+        class="absolute inset-0 size-full object-cover"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent lg:from-black/70"></div>
+      {
+        featured && (
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-8 pt-32 lg:p-12">
+            <div class="ml-auto max-w-xs border-l border-white/40 pl-5">
+              <div class="text-xs font-bold uppercase tracking-[.2em] text-white/55">Destacado</div>
+              <div class="font-display mt-2 text-2xl font-extrabold italic">
+                {featured.brand} {featured.model}
+              </div>
+              <div class="mt-1 text-sm text-white/60">
+                {featured.year} · {formatKm(featured.km)} km · {featured.transmission}
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

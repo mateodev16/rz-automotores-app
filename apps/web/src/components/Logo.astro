@@ -1,0 +1,22 @@
+---
+import logo from '../assets/images/logo-rz.png';
+
+interface Props {
+  /** Renders the light version of the mark (for dark backgrounds). */
+  dark?: boolean;
+  href?: string;
+  class?: string;
+}
+
+const { dark = false, href = '/', class: className = '' } = Astro.props;
+---
+
+<a href={href} class={`flex items-center ${className}`} aria-label="RZ Automotores, inicio">
+  <img
+    src={logo.src}
+    alt="RZ Automotores"
+    width="192"
+    height="40"
+    class={`h-auto w-48 object-contain ${dark ? '' : 'invert'}`}
+  />
+</a>

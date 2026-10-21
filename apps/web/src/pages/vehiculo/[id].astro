@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Icon from '../../components/Icon.astro';
+import WhatsAppFab from '../../components/WhatsAppFab.astro';
+import CarCard from '../../components/CarCard.astro';
+import { getCar, getCars } from '../../lib/cars';
+import { formatKm, formatMoney } from '../../lib/format';
+import { WHATSAPP_LINK } from '../../lib/config';
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect('/vehiculos');
+}
+
+const car = await getCar(id);
+
+if (!car) {
+  Astro.response.status = 404;
+}
+
+const { cars } = await getCars();
+const related = cars.filter((item) => item.id !== car?.id).slice(0, 3);
+
+const title = car ? `${car.brand} ${car.model} ${car.year}` : 'Vehículo no encontrado';
+const specs = car
+  ? [
+      ['Año', String(car.year)],
+      ['Kilometraje', `${formatKm(car.km)} km`],
+      ['Transmisión', car.transmission],
+      ['Combustible', car.fuel],
+      ['Ubicación', car.location],
+      ...(car.color ? [['Color', car.color]] : []),
+    ]
+  : [];
+
+const whatsappHref = car
+  ? `${WHATSAPP_LINK}?text=${encodeURIComponent(
+      `Hola, quiero consultar por el ${car.brand} ${car.model} ${car.year}.`,
+    )}`
+  : WHATSAPP_LINK;
+---
+
+<Layout title={`${title} - RZ Automotores`} description={car ? `${car.brand} ${car.model} ${car.year} en ${car.location}.` : 'Vehículo no encontrado'}>
+  <Header />
+  <main>
+    {
+      car ? (
+        <section class="bg-white px-5 py-12 md:px-10 lg:py-16">
+          <div class="mx-auto max-w-[1380px]">
+            <a href="/vehiculos" class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-black/45 hover:text-black">
+              <Icon name="chevron" size={16} class="rotate-180" /> Volver al catálogo
+            </a>
+
+            <div class="mt-8 grid gap-px bg-black/15 lg:grid-cols-[1.25fr_.75fr]">
+              <div class="bg-neutral-100">
+                <img
+                  src={car.image}
+                  alt={`${car.brand} ${car.model}`}
+                  width="1200"
+                  height="900"
+                  class="size-full object-cover"
+                />
+              </div>
+
+              <div class="flex flex-col justify-between bg-white p-7 md:p-10">
+                <div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="tag bg-black text-white">{car.location}</span>
+                    {car.featured && <span class="tag bg-[#f1f1ef] text-black">Destacado</span>}
+                  </div>
+                  <div class="mt-8 text-xs font-bold uppercase tracking-[.2em] text-black/40">{car.brand}</div>
+                  <h1 class="font-display mt-2 text-5xl font-black italic leading-none md:text-6xl">
+                    {car.model}
+                  </h1>
+                  <div class="font-display mt-5 text-3xl font-black italic">
+                    {formatMoney(car.price, car.currency)}
+                  </div>
+
+                  {car.description && (
+                    <p class="mt-7 leading-relaxed text-black/55">{car.description}</p>
+                  )}
+
+                  <div class="mt-10 divide-y divide-black/10 border-y border-black/10">
+                    {specs.map(([label, value]) => (
+                      <div class="flex justify-between py-4 text-sm">
+                        <span class="text-black/45">{label}</span>
+                        <strong>{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <a class="btn-black mt-10 w-full justify-center" href={whatsappHref} target="_blank" rel="noreferrer">
+                  <Icon name="whatsapp" /> Consultar por WhatsApp
+                </a>
+              </div>
+            </div>
+
+            {related.length > 0 && (
+              <div class="mt-20">
+                <div class="eyebrow">También te puede interesar</div>
+                <h2 class="section-title mt-3">Otros vehículos.</h2>
+                <div class="mt-9 grid gap-x-5 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
+                  {related.map((item) => (
+                    <CarCard car={item} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      ) : (
+        <section class="bg-white px-5 py-32 text-center md:px-10">
+          <div class="mx-auto max-w-lg">
+            <Icon name="search" size={36} class="mx-auto" />
+            <h1 class="font-display mt-6 text-4xl font-black italic">Vehículo no encontrado</h1>
+            <p class="mt-4 text-black/55">
+              Puede que el vehículo ya no esté disponible. Mirá nuestro catálogo completo.
+            </p>
+            <a href="/vehiculos" class="btn-black mt-8">Ver todos los vehículos</a>
+          </div>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+  <WhatsAppFab />
+</Layout>

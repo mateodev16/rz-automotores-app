@@ -5,3 +5,7 @@ dist
 .astro
 uploads/*
 !uploads/.gitkeep
+
+# Only the root lockfile is used in this workspace monorepo; nested ones break `npm ci`.
+apps/*/package-lock.json
+.vercel

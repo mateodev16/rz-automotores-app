@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Stock from '../components/Stock.astro';
+import About from '../components/About.astro';
+import Locations from '../components/Locations.astro';
+import Footer from '../components/Footer.astro';
+import CarModal from '../components/CarModal.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
+import { getBrands, getCars, getLocations, pickFeatured } from '../lib/cars';
+
+const { cars } = await getCars();
+const brands = getBrands(cars);
+const locations = getLocations(cars);
+const featured = pickFeatured(cars);
+---
+
+<Layout title="RZ Automotores - Autos usados en Minas y Montevideo" description="Vehículos seleccionados, financiación a medida y atención personal en Minas y Montevideo, Uruguay.">
+  <Header />
+  <main>
+    <Hero featured={featured} />
+    <Stock cars={cars} brands={brands} locations={locations} />
+    <About />
+    <Locations />
+  </main>
+  <Footer />
+  <CarModal cars={cars} />
+  <WhatsAppFab />
+</Layout>

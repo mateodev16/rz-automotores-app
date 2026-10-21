@@ -1,0 +1,35 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { WHATSAPP_LINK } from '../lib/config';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-black px-5 pb-8 pt-16 text-white md:px-10">
+  <div class="mx-auto max-w-[1380px]">
+    <div class="flex flex-col justify-between gap-10 border-b border-white/15 pb-12 md:flex-row md:items-end">
+      <div>
+        <Logo dark />
+        <p class="mt-5 max-w-sm text-sm leading-relaxed text-white/45">
+          VehÃ­culos seleccionados y atenciÃ³n personal en Minas y Montevideo.
+        </p>
+      </div>
+      <div>
+        <div class="mb-4 text-xs font-bold uppercase tracking-[.18em] text-white/40">Seguinos</div>
+        <div class="flex gap-3">
+          <a href="https://instagram.com" class="social-button" aria-label="Instagram" target="_blank" rel="noreferrer">
+            <Icon name="instagram" />
+          </a>
+          <a href={WHATSAPP_LINK} class="social-button" aria-label="WhatsApp" target="_blank" rel="noreferrer">
+            <Icon name="whatsapp" />
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col justify-between gap-3 pt-7 text-xs text-white/35 md:flex-row">
+      <span>Â© {year} RZ Automotores. Todos los derechos reservados.</span>
+      <span>Minas Â· Montevideo Â· Uruguay</span>
+    </div>
+  </div>
+</footer>

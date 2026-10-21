@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import VehicleForm from '../../../components/admin/VehicleForm.astro';
+---
+
+<AdminLayout title="Nuevo vehículo">
+  <div class="eyebrow">Inventario</div>
+  <h1 class="font-display mt-2 text-4xl font-black italic md:text-5xl">Agregar vehículo</h1>
+  <p class="mt-2 text-sm text-black/45">Completá los datos para publicarlo en el catálogo.</p>
+
+  <div class="mt-8">
+    <VehicleForm formId="vehicle-form" mode="create" />
+  </div>
+</AdminLayout>

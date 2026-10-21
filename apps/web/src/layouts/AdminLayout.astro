@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  active?: 'vehiculos' | 'resumen';
+  count?: number;
+}
+
+const { title, subtitle = 'RZ Automotores', active = 'vehiculos', count } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Panel de administración de RZ Automotores" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title} - Admin RZ Automotores</title>
+  </head>
+  <body class="min-h-screen bg-[#f1f1ef] text-black">
+    <aside class="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-black p-7 text-white lg:flex">
+      <Logo dark />
+      <div class="mt-14 text-[10px] font-bold uppercase tracking-[.2em] text-white/35">Panel de control</div>
+      <nav class="mt-5">
+        <a href="/admin" class="admin-nav active">
+          <Icon name="car" /> Vehículos <span id="sidebar-count">{count ?? ''}</span>
+        </a>
+        <a href="/admin" class="admin-nav">
+          <Icon name="dashboard" /> Resumen
+        </a>
+      </nav>
+      <div class="mt-auto border-t border-white/15 pt-6">
+        <a href="/" class="admin-back">
+          <Icon name="arrow" size={18} /> Volver al sitio
+        </a>
+      </div>
+    </aside>
+
+    <main class="lg:ml-72">
+      <header class="flex h-20 items-center justify-between border-b border-black/10 bg-white px-5 md:px-10">
+        <div>
+          <div class="font-display text-xl font-black italic">{title}</div>
+          <div class="text-xs text-black/40">{subtitle}</div>
+        </div>
+        <a href="/" class="btn-ghost lg:hidden">Volver</a>
+        <div class="hidden items-center gap-3 lg:flex">
+          <span class="grid size-9 place-items-center rounded-full bg-black text-xs font-bold text-white">RZ</span>
+          <div class="text-sm">
+            <strong>Administrador</strong>
+            <span class="block text-xs text-black/40">admin@rz.com.uy</span>
+          </div>
+        </div>
+      </header>
+      <div class="p-5 md:p-10 xl:p-14">
+        <div class="mx-auto max-w-6xl">
+          <slot />
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+
+<script>
+  import { requireToken } from '../lib/client';
+
+  requireToken();
+</script>

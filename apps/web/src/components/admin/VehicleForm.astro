@@ -1,0 +1,247 @@
+---
+import Icon from '../Icon.astro';
+import type { Car } from '../../lib/types';
+
+interface Props {
+  /** Existing vehicle when editing. */
+  car?: Car;
+  mode?: 'create' | 'edit';
+  /** Unique prefix so the component can be mounted more than once per page. */
+  formId?: string;
+}
+
+const { car, mode = 'create', formId = 'vehicle-form' } = Astro.props;
+const title = mode === 'edit' ? 'Editar vehículo' : 'Nuevo vehículo';
+const subtitle =
+  mode === 'edit'
+    ? 'Actualizá los datos del vehículo publicado.'
+    : 'Completá los datos para publicarlo en el catálogo.';
+---
+
+<form id={formId} class="border border-black/10 bg-white p-5 shadow-sm md:p-8" data-vehicle-form data-mode={mode} data-car-id={car?.id ?? ''}>
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 class="font-display text-2xl font-black italic">{title}</h2>
+      <p class="mt-1 text-sm text-black/45">{subtitle}</p>
+    </div>
+    <span class="hidden items-center gap-2 bg-black px-3 py-2 text-xs font-bold text-white" data-saved-badge>
+      <Icon name="check" size={15} /> Guardado
+    </span>
+  </div>
+
+  <div class="mt-7 grid gap-5 md:grid-cols-2">
+    <label class="form-field">
+      <span>Marca *</span>
+      <input id={`${formId}-brand`} name="brand" required value={car?.brand ?? ''} placeholder="Ej. Volkswagen" />
+    </label>
+    <label class="form-field">
+      <span>Modelo *</span>
+      <input id={`${formId}-model`} name="model" required value={car?.model ?? ''} placeholder="Ej. Nivus Highline" />
+    </label>
+    <label class="form-field">
+      <span>Año *</span>
+      <input
+        id={`${formId}-year`}
+        name="year"
+        type="number"
+        min="1950"
+        max="2030"
+        required
+        value={car?.year ?? new Date().getFullYear()}
+      />
+    </label>
+    <label class="form-field">
+      <span>Precio *</span>
+      <input
+        id={`${formId}-price`}
+        name="price"
+        type="number"
+        min="0"
+        step="0.01"
+        required
+        value={car?.price ?? ''}
+        placeholder="29900"
+      />
+    </label>
+    <label class="form-field">
+      <span>Moneda</span>
+      <select id={`${formId}-currency`} name="currency">
+        <option value="USD" selected={car?.currency !== 'UYU'}>USD</option>
+        <option value="UYU" selected={car?.currency === 'UYU'}>UYU</option>
+      </select>
+    </label>
+    <label class="form-field">
+      <span>Kilometraje</span>
+      <input id={`${formId}-km`} name="km" type="number" min="0" value={car?.km ?? ''} placeholder="28000" />
+    </label>
+    <label class="form-field">
+      <span>Ubicación</span>
+      <select id={`${formId}-location`} name="location">
+        {
+          ['Minas', 'Montevideo', 'Ambos'].map((option) => (
+            <option value={option} selected={car?.location === option}>
+              {option}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+    <label class="form-field">
+      <span>Transmisión</span>
+      <select id={`${formId}-transmission`} name="transmission">
+        {
+          ['Automática', 'Manual'].map((option) => (
+            <option value={option} selected={car?.transmission === option}>
+              {option}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+    <label class="form-field">
+      <span>Combustible</span>
+      <select id={`${formId}-fuel`} name="fuel">
+        {
+          ['Nafta', 'Diésel', 'Híbrido', 'Eléctrico'].map((option) => (
+            <option value={option} selected={car?.fuel === option}>
+              {option}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+    <label class="form-field">
+      <span>Color</span>
+      <input id={`${formId}-color`} name="color" value={car?.color ?? ''} placeholder="Gris platino" />
+    </label>
+  </div>
+
+  <label class="form-field mt-5">
+    <span>Descripción</span>
+    <textarea id={`${formId}-description`} name="description" rows="4" placeholder="Detalle el vehículo, sus características y estado.">{car?.description ?? ''}</textarea>
+  </label>
+
+  <div class="mt-5 flex flex-wrap gap-6 border border-black/10 p-4">
+    <label class="flex items-center gap-2 text-sm font-bold">
+      <input id={`${formId}-featured`} name="featured" type="checkbox" checked={car?.featured ?? false} class="size-4 accent-black" />
+      Destacado
+    </label>
+    <label class="flex items-center gap-2 text-sm font-bold">
+      <input id={`${formId}-published`} name="published" type="checkbox" checked={car ? car.status !== 'draft' : true} class="size-4 accent-black" />
+      Publicado
+    </label>
+  </div>
+
+  <label class="mt-5 block">
+    <span class="mb-2 block text-xs font-bold uppercase tracking-[.13em]">Imágenes</span>
+    <span class="relative flex min-h-52 cursor-pointer items-center justify-center overflow-hidden border border-dashed border-black/25 bg-[#f7f7f5] transition hover:border-black">
+      <span class="absolute inset-0 hidden" data-image-preview></span>
+      <span class="text-center" data-upload-placeholder>
+        <span class="mx-auto grid size-11 place-items-center border border-black/20 bg-white">
+          <Icon name="upload" />
+        </span>
+        <strong class="mt-3 block text-sm">Subir fotografías</strong>
+        <span class="mt-1 block text-xs text-black/40">JPG o PNG · hasta 10 archivos</span>
+      </span>
+      <input
+        id={`${formId}-images`}
+        name="images"
+        type="file"
+        accept="image/*"
+        multiple
+        class="absolute inset-0 cursor-pointer opacity-0"
+      />
+    </span>
+  </label>
+
+  <div class="mt-7 flex flex-wrap justify-end gap-3 border-t border-black/10 pt-6">
+    <a href="/admin" class="btn-ghost">Cancelar</a>
+    <button type="submit" class="btn-black" data-submit>
+      <Icon name="check" /> {mode === 'edit' ? 'Guardar cambios' : 'Publicar vehículo'}
+    </button>
+  </div>
+
+  <p class="mt-4 hidden text-xs text-red-600" data-form-error></p>
+</form>
+
+<script>
+  import { adminFetch } from '../../lib/client';
+
+  const form = document.getElementById('vehicle-form') ?? document.querySelector('[data-vehicle-form]');
+  if (form) {
+    const formId = form.id;
+    const mode = form.getAttribute('data-mode');
+    const carId = form.getAttribute('data-car-id');
+    const errorEl = form.querySelector('[data-form-error]');
+    const savedBadge = form.querySelector('[data-saved-badge]');
+    const submitBtn = form.querySelector('[data-submit]');
+    const fileInput = form.querySelector('#' + CSS.escape(`${formId}-images`));
+    const preview = form.querySelector('[data-image-preview]');
+    const placeholder = form.querySelector('[data-upload-placeholder]');
+
+    fileInput?.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file || !preview || !placeholder) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        preview.style.backgroundImage = `url(${reader.result})`;
+        preview.style.backgroundSize = 'cover';
+        preview.style.backgroundPosition = 'center';
+        preview.style.position = 'absolute';
+        preview.style.inset = '0';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const value = (name) => form.elements.namedItem(name)?.value ?? '';
+    const checked = (name) => Boolean(form.elements.namedItem(name)?.checked);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (errorEl) errorEl.classList.add('hidden');
+      submitBtn?.setAttribute('disabled', 'disabled');
+
+      const payload = {
+        brand: value('brand'),
+        model: value('model'),
+        year: Number(value('year')),
+        km: value('km') ? Number(value('km')) : null,
+        price: Number(value('price')),
+        currency: value('currency') || 'USD',
+        location: value('location') || 'Montevideo',
+        fuel: value('fuel'),
+        transmission: value('transmission'),
+        color: value('color'),
+        description: value('description'),
+        status: checked('published') ? 'published' : 'draft',
+        featured: checked('featured'),
+      };
+
+      try {
+        const saved = await adminFetch(mode === 'edit' ? `/api/cars/${carId}` : '/api/cars', {
+          method: mode === 'edit' ? 'PUT' : 'POST',
+          body: JSON.stringify(payload),
+        });
+
+        const files = fileInput?.files;
+        if (files && files.length) {
+          const data = new FormData();
+          Array.from(files).forEach((file) => data.append('images', file));
+          await adminFetch(`/api/cars/${saved.id}/images`, { method: 'POST', body: data });
+        }
+
+        savedBadge?.classList.remove('hidden');
+        savedBadge?.classList.add('flex');
+        window.setTimeout(() => window.location.assign('/admin'), 700);
+      } catch (error) {
+        if (errorEl) {
+          errorEl.textContent = error?.message ?? 'No se pudo guardar el vehículo.';
+          errorEl.classList.remove('hidden');
+        }
+        submitBtn?.removeAttribute('disabled');
+      }
+    });
+  }
+</script>

@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --color-ink: #080808;
+  --color-shell: #f4f4f2;
+  --color-panel: #f1f1ef;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #fff;
+    color: #080808;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  a,
+  select {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: #080808;
+    color: #fff;
+  }
+}
+
+@layer components {
+  .nav-link {
+    position: relative;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .nav-link::after {
+    position: absolute;
+    right: 0;
+    bottom: -.5rem;
+    left: 0;
+    height: 1px;
+    transform: scaleX(0);
+    background: #080808;
+    content: '';
+    transition: transform .25s ease;
+  }
+
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .mobile-link {
+    display: block;
+    border-bottom: 1px solid rgb(0 0 0 / .1);
+    padding: 1rem .25rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .btn-black,
+  .btn-white,
+  .btn-outline,
+  .btn-dark-outline,
+  .btn-ghost {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    padding: .75rem 1.35rem;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    transition: all .2s ease;
+  }
+
+  .btn-black {
+    background: #080808;
+    color: white;
+  }
+
+  .btn-black:hover {
+    background: #303030;
+  }
+
+  .btn-white {
+    background: white;
+    color: #080808;
+  }
+
+  .btn-white:hover {
+    background: #dadada;
+  }
+
+  .btn-outline {
+    border: 1px solid rgb(0 0 0 / .35);
+    color: #080808;
+  }
+
+  .btn-outline:hover {
+    border-color: #080808;
+    background: #080808;
+    color: white;
+  }
+
+  .btn-dark-outline {
+    border: 1px solid rgb(255 255 255 / .35);
+    color: white;
+  }
+
+  .btn-dark-outline:hover {
+    border-color: white;
+  }
+
+  .btn-ghost {
+    padding-right: .75rem;
+    padding-left: .75rem;
+  }
+
+  .btn-ghost:hover {
+    background: rgb(0 0 0 / .06);
+  }
+
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / .5);
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow::before {
+    height: 1px;
+    width: 1.75rem;
+    background: currentColor;
+    content: '';
+  }
+
+  .section-title {
+    margin-top: .6rem;
+    max-width: 52rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(2.8rem, 5vw, 5.25rem);
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: -.045em;
+    line-height: .95;
+    text-transform: uppercase;
+  }
+
+  .filter-field {
+    display: block;
+    min-width: 11rem;
+    border: 1px solid rgb(0 0 0 / .15);
+    background: white;
+    padding: .6rem .9rem;
+  }
+
+  .filter-field span {
+    display: block;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .filter-field select {
+    margin-top: .2rem;
+    width: 100%;
+    background: transparent;
+    font-size: .85rem;
+    outline: none;
+  }
+
+  .tag {
+    display: inline-flex;
+    padding: .45rem .65rem;
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .car-card {
+    min-width: 0;
+  }
+
+  .car-modal {
+    display: none;
+  }
+
+  .car-modal.is-open {
+    display: flex;
+  }
+
+  .social-button {
+    display: grid;
+    height: 3rem;
+    width: 3rem;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / .2);
+    transition: all .2s ease;
+  }
+
+  .social-button:hover {
+    background: white;
+    color: #080808;
+  }
+
+  .admin-nav {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: .8rem;
+    border-left: 2px solid transparent;
+    padding: .9rem 1rem;
+    color: rgb(255 255 255 / .45);
+    font-size: .85rem;
+    text-align: left;
+  }
+
+  .admin-nav span {
+    margin-left: auto;
+    border-radius: 999px;
+    background: rgb(255 255 255 / .1);
+    padding: .15rem .5rem;
+    font-size: .65rem;
+  }
+
+  .admin-nav:hover,
+  .admin-nav.active {
+    border-left-color: white;
+    background: rgb(255 255 255 / .08);
+    color: white;
+  }
+
+  .admin-back {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    color: rgb(255 255 255 / .55);
+    font-size: .8rem;
+  }
+
+  .admin-back svg {
+    transform: rotate(180deg);
+  }
+
+  .admin-back:hover {
+    color: white;
+  }
+
+  .form-field span {
+    margin-bottom: .45rem;
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    height: 3rem;
+    width: 100%;
+    border: 1px solid rgb(0 0 0 / .16);
+    background: white;
+    padding: 0 .9rem;
+    font-size: .85rem;
+    outline: none;
+    transition: border-color .2s ease;
+  }
+
+  .form-field textarea {
+    height: auto;
+    padding: .75rem .9rem;
+    resize: vertical;
+  }
+
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    border-color: #080808;
+  }
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker {
+  width: max-content;
+  animation: ticker 28s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
