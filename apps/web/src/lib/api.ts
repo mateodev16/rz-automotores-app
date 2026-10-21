@@ -4,19 +4,25 @@
  * Server side only: `API_URL` is resolved at request time so the deployment
  * can point at a different host without rebuilding the site.
  */
-import { PUBLIC_API_URL, WHATSAPP_NUMBER, whatsappLink } from './config';
+import { API_ORIGIN, WHATSAPP_NUMBER, whatsappLink } from './config';
 
 export { whatsappLink, WHATSAPP_LINK, WHATSAPP_NUMBER } from './config';
 
+/**
+ * Origen de la API visto desde el servidor.
+ *
+ * `API_URL` permite apuntar a otro host sin recompilar; si no está, se usa
+ * el origen público de la API (el proyecto de Vercel que la expone).
+ */
 export const API_URL: string = (
-  process.env.API_URL ?? PUBLIC_API_URL
+  process.env.API_URL ?? API_ORIGIN
 ).replace(/\/$/, '');
 
 /** Turns a relative upload path coming from the API into an absolute URL. */
 export function resolveImage(url?: string | null): string {
   if (!url) return '';
   if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
-  return `${API_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
 /** Error thrown when the API answers with a non 2xx status. */

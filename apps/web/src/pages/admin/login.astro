@@ -70,7 +70,7 @@ import Icon from '../../components/Icon.astro';
 </Layout>
 
 <script>
-  import { setToken } from '../../lib/client';
+  import { API, setToken } from '../../lib/client';
 
   const form = document.getElementById('login-form');
   const errorEl = document.getElementById('error');
@@ -85,14 +85,11 @@ import Icon from '../../components/Icon.astro';
     const password = (form.elements.namedItem('password') as HTMLInputElement)?.value ?? '';
 
     try {
-      const response = await fetch(
-        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000'}/api/auth/login`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        },
-      );
+      const response = await fetch(`${API}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
       const data = await response.json();
 
       if (!response.ok) {

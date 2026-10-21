@@ -3,6 +3,5 @@
   "framework": "astro",
   "installCommand": "npm install",
   "buildCommand": "astro build",
-  "outputDirectory": ".vercel/output",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "outputDirectory": ".vercel/output"
 }

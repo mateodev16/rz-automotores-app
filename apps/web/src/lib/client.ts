@@ -2,7 +2,7 @@
  * Browser helpers for the admin panel.
  * Safe to import from `<script>` blocks (client bundle).
  */
-import { PUBLIC_API_URL } from './config';
+import { API_ORIGIN, PUBLIC_API_URL } from './config';
 
 export const API = PUBLIC_API_URL;
 export const TOKEN_KEY = 'rz_token';
@@ -89,5 +89,5 @@ export function money(price: number | string, currency = 'USD'): string {
 export function imageUrl(url?: string | null): string {
   if (!url) return '';
   if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
-  return `${API}${url.startsWith('/') ? '' : '/'}${url}`;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
 }
