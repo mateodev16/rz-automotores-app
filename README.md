@@ -48,6 +48,14 @@ cp .env.example .env
 # Editar .env con tus credenciales de PostgreSQL
 ```
 
+En producción la base es un Postgres alojado (Neon o Supabase). Usá siempre
+la **connection string pooled** (host `-pooler`), que es la que evita agotar
+las conexiones en un entorno serverless:
+
+```bash
+DATABASE_URL=postgresql://usuario:clave@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
+```
+
 3. Configurar el frontend (opcional, los valores por defecto apuntan a `localhost:4000`)
 
 ```bash
@@ -73,7 +81,18 @@ npm run migrate --workspace=apps/api
 Credenciales por defecto: `admin@rzautomotores.com` / `admin123`
 (override con `ADMIN_EMAIL` y `ADMIN_PASSWORD`).
 
-5. Ejecutar en desarrollo
+5. Cargar el catálogo de demostración (opcional)
+
+```bash
+npm run seed --workspace=apps/api
+```
+
+Inserta en la base los mismos vehículos que el sitio usa como fallback
+(`apps/web/src/lib/demo-cars.ts`), para que una instalación nueva no quede
+vacía. Se pueden borrar o editar desde el panel de administración. Es
+idempotente: si ya hay autos no hace nada salvo que pases `-- --force`.
+
+6. Ejecutar en desarrollo
 
 ```bash
 npm run dev
@@ -203,13 +222,18 @@ filesystem es de sólo lectura, por eso el token es obligatorio en producción).
 - Variables: `PUBLIC_API_URL=https://<tu-api>.vercel.app` y
   `PUBLIC_WHATSAPP_NUMBER`
 
-**5. Migraciones**
+**5. Migraciones y datos**
 
 Corrélas una vez desde tu máquina, apuntando a la base de Neon:
 
 ```bash
 DATABASE_URL="postgresql://..." npm run migrate --workspace=apps/api
+DATABASE_URL="postgresql://..." npm run seed --workspace=apps/api
 ```
+
+La primera crea el esquema y el usuario admin; la segunda carga el catálogo
+de demostración (los mismos autos que usa el sitio como fallback) para que
+la web no quede vacía al publicarse. Se borran o editan desde `/admin`.
 
 Notas del modo serverless:
 

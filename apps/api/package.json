@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "node --check src/index.js && node --check src/routes/cars.js && node --check src/routes/auth.js && node --check src/config/migrate.js && node --check src/config/db.js && node --check src/storage.js",
+    "build": "node --check src/index.js && node --check src/routes/cars.js && node --check src/routes/auth.js && node --check src/config/migrate.js && node --check src/config/db.js && node --check src/storage.js && node --check scripts/seed-demo.mjs",
     "migrate": "node src/config/migrate.js",
+    "seed": "node scripts/seed-demo.mjs",
     "test": "node __test__/api.test.mjs"
   },
   "dependencies": {
