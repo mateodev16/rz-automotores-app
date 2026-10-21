@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "node --check src/index.js && node --check src/routes/cars.js && node --check src/routes/auth.js && node --check src/config/migrate.js && node --check src/config/db.js",
+    "build": "node --check src/index.js && node --check src/routes/cars.js && node --check src/routes/auth.js && node --check src/config/migrate.js && node --check src/config/db.js && node --check src/storage.js",
     "migrate": "node src/config/migrate.js",
     "test": "node __test__/api.test.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "^2.8.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

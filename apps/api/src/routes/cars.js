@@ -3,14 +3,10 @@ import { pool } from '../config/db.js';
 import { authenticateToken } from '../middleware/auth.js';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
+import { removeImage, saveImage } from '../storage.js';
 
 const router = express.Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const IMAGES_SELECT = `
   COALESCE(
@@ -223,27 +219,29 @@ router.get('/:id', async (req, res) => {
 });
 
 // Image upload
-const uploadDir = process.env.UPLOAD_DIR
-  ? path.isAbsolute(process.env.UPLOAD_DIR)
-    ? process.env.UPLOAD_DIR
-    : path.resolve(__dirname, '../../../', process.env.UPLOAD_DIR)
-  : path.resolve(__dirname, '../../../uploads');
+// The images are kept in memory and then uploaded to the storage driver
+// (Vercel Blob in production, local disk in development). Writing straight to
+// disk with multer does not work on serverless runtimes, where the
+// filesystem is read-only.
+const isServerless = Boolean(process.env.VERCEL);
+const MAX_IMAGES = Number(process.env.MAX_IMAGES) || (isServerless ? 4 : 10);
+const MAX_FILE_SIZE =
+  Number(process.env.MAX_FILE_SIZE) || (isServerless ? 3 * 1024 * 1024 : 8 * 1024 * 1024);
 
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, uuidv4() + path.extname(file.originalname)),
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE, files: MAX_IMAGES },
 });
-const upload = multer({ storage });
 
-router.post('/:id/images', authenticateToken, upload.array('images', 10), async (req, res) => {
+router.post('/:id/images', authenticateToken, upload.array('images', MAX_IMAGES), async (req, res) => {
   try {
     const carId = req.params.id;
     const files = req.files ?? [];
 
     for (let i = 0; i < files.length; i++) {
-      const imageUrl = `/uploads/${files[i].filename}`;
+      const file = files[i];
+      const filename = uuidv4() + (path.extname(file.originalname) || '.jpg');
+      const imageUrl = await saveImage(file.buffer, filename, file.mimetype);
       await pool.query(
         'INSERT INTO car_images (car_id, image_url, sort_order) VALUES ($1, $2, $3)',
         [carId, imageUrl, i],
@@ -258,7 +256,13 @@ router.post('/:id/images', authenticateToken, upload.array('images', 10), async 
 
 router.delete('/images/:imageId', authenticateToken, async (req, res) => {
   try {
-    await pool.query('DELETE FROM car_images WHERE id = $1', [req.params.imageId]);
+    const result = await pool.query(
+      'DELETE FROM car_images WHERE id = $1 RETURNING image_url',
+      [req.params.imageId],
+    );
+    if (result.rows[0]?.image_url) {
+      await removeImage(result.rows[0].image_url);
+    }
     res.json({ success: true });
   } catch (e) {
     console.error(e);

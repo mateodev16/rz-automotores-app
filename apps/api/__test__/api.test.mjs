@@ -1,8 +1,13 @@
 import { register } from 'node:module';
 import assert from 'node:assert/strict';
 import http from 'node:http';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 process.env.JWT_SECRET = 'test_secret';
+// Keep the uploaded files out of the repository.
+process.env.UPLOAD_DIR = path.join(os.tmpdir(), 'rz-api-test-uploads');
 
 register('./loader.mjs', import.meta.url);
 
@@ -178,7 +183,31 @@ check('user lookup binds the email as $1', () => {
   assert.deepEqual(placeholders(lastCall().sql), [1]);
 });
 
+console.log('\nPOST /api/cars/:id/images');
+const token = await getToken();
+const form = new FormData();
+form.append('images', new Blob([Buffer.from('fake-image-bytes')], { type: 'image/jpeg' }), 'photo.jpg');
+res = await fetch(`${base}/api/cars/car-1/images`, {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${token}` },
+  body: form,
+});
+body = await res.json();
+check('stores the image and returns the count', () => {
+  assert.equal(res.status, 200);
+  assert.equal(body.count, 1);
+});
+check('binds the car id and the upload path', () => {
+  assert.equal(lastCall().params[0], 'car-1');
+  assert.match(lastCall().params[1], /^\/uploads\/[0-9a-f-]+\.jpg$/);
+});
+check('writes the file to the upload directory', () => {
+  const file = path.join(process.env.UPLOAD_DIR, path.basename(lastCall().params[1]));
+  assert.ok(fs.existsSync(file));
+});
+
 server.close();
+fs.rmSync(process.env.UPLOAD_DIR, { recursive: true, force: true });
 
 console.log(failures ? `\n${failures} check(s) failed.` : '\nAll API checks passed.');
 process.exit(failures ? 1 : 0);

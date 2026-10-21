@@ -147,9 +147,77 @@ ya define el build del monorepo:
   `PUBLIC_API_URL` (URL pública de la API) y `PUBLIC_WHATSAPP_NUMBER`.
 - El lockfile de referencia es el de la raíz del repo (`package-lock.json`).
   Los lockfiles por workspace están ignorados a propósito: rompen `npm ci`.
-- La API (Express + PostgreSQL) no corre en Vercel; hosteala aparte (VPS,
-  Railway, Render…) y apuntá `PUBLIC_API_URL` a esa URL. Si la API no está
-  disponible, el sitio sigue online con el catálogo de demostración.
+- Si la API no está disponible, el sitio sigue online con el catálogo de
+  demostración incluido en `apps/web/src/lib/demo-cars.ts`.
+
+### Todo serverless (Vercel + Neon + Vercel Blob)
+
+La API también puede correr 100% serverless, sin ningún servidor siempre
+encendido. Son **dos proyectos de Vercel** (el sitio y la API) y una base
+Postgres alojada:
+
+| Pieza              | Servicio        | Notas                                                        |
+| ------------------ | --------------- | ------------------------------------------------------------ |
+| Sitio (Astro SSR)  | Vercel          | Proyecto 1, Root Directory = raíz del repo                     |
+| API (Express)      | Vercel          | Proyecto 2, Root Directory = `apps/api`                       |
+| Base de datos      | Neon / Supabase | Postgres gestionado, plan gratuito                           |
+| Imágenes           | Vercel Blob     | `BLOB_READ_WRITE_TOKEN`, 500 MB gratis                        |
+
+**1. Base de datos (Neon)**
+
+Creá una base en [neon.tech](https://neon.tech) y copiá la **connection
+string.pooled** (el host `-pooler`), que es la que se usa en serverless para
+no agotar conexiones. El SQL no cambia: `apps/api/src/config/migrate.js` usa
+Postgres puro.
+
+```bash
+DATABASE_URL=postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
+```
+
+**2. Proyecto de la API en Vercel**
+
+- Root Directory: `apps/api`
+- Framework: Other (lo define `apps/api/vercel.json`, que compila
+  `src/index.js` con `@vercel/node` y exporta la app de Express como handler)
+- Variables de entorno:
+
+  | Variable               | Valor                                            |
+  | ---------------------- | ------------------------------------------------ |
+  | `DATABASE_URL`         | connection string pooled de Neon                 |
+  | `JWT_SECRET`           | string largo y aleatorio                          |
+  | `BLOB_READ_WRITE_TOKEN` | token que genera Vercel al conectar Blob         |
+  | `CORS_ORIGIN`          | URL del sitio (opcional; vacío = todos)          |
+  | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | credenciales del admin (opcional)       |
+
+**3. Imágenes**
+
+Con `BLOB_READ_WRITE_TOKEN` presente, las subidas del panel de administración
+van a Vercel Blob y se guarda la URL pública. Sin ese token, la API escribe en
+`uploads/` en disco, que es el modo de desarrollo local (en Vercel el
+filesystem es de sólo lectura, por eso el token es obligatorio en producción).
+
+**4. Proyecto del sitio en Vercel**
+
+- Root Directory: raíz del repo (o `apps/web`, para eso está
+  `apps/web/vercel.json`)
+- Variables: `PUBLIC_API_URL=https://<tu-api>.vercel.app` y
+  `PUBLIC_WHATSAPP_NUMBER`
+
+**5. Migraciones**
+
+Corrélas una vez desde tu máquina, apuntando a la base de Neon:
+
+```bash
+DATABASE_URL="postgresql://..." npm run migrate --workspace=apps/api
+```
+
+Notas del modo serverless:
+
+- El pool de Postgres usa **1 conexión por instancia** y se cierra sola.
+- Los límites de subida son 4 imágenes × 3 MB por request (Vercel limita el
+  body a 4.5 MB); ajustables con `MAX_IMAGES` y `MAX_FILE_SIZE`.
+- La API se exporta como handler y **no** escucha en ningún puerto cuando
+  `VERCEL=1`; en local sigue funcionando igual que siempre (`npm run dev`).
 
 ## Contacto
 
