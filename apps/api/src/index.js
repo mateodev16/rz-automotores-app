@@ -33,5 +33,7 @@ if (!process.env.VERCEL) {
     console.log(`API running on http://localhost:${PORT}`);
   });
 }
-
+app.get('/', (req, res) => {
+  res.json({ status: "API funcionando correctamente" });
+});
 export default app;
